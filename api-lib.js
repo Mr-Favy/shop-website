@@ -28,11 +28,20 @@ async function supabase(method, path, payload, { token } = {}) {
   const headers = { apikey: key, 'Content-Type': 'application/json', Prefer: 'return=representation' };
   if (token) headers.Authorization = `Bearer ${token}`;
   else if (!(restPath && key.startsWith('sb_secret_'))) headers.Authorization = `Bearer ${key}`;
-  const response = await fetch(settings.url + path, {
-    method,
-    headers,
-    ...(payload === undefined ? {} : { body: JSON.stringify(payload) }),
-  });
+  let response;
+  try {
+    response = await fetch(settings.url + path, {
+      method,
+      headers,
+      ...(payload === undefined ? {} : { body: JSON.stringify(payload) }),
+      signal: AbortSignal.timeout(12_000),
+    });
+  } catch (error) {
+    const detail = error?.name === 'TimeoutError'
+      ? 'The shop database took too long to respond. Please try again.'
+      : 'The shop database could not be reached. Check that SUPABASE_URL is correct and the database is online.';
+    throw new HttpError(503, detail);
+  }
   const raw = await response.text();
   let data = null;
   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
