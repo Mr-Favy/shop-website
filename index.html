@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f3ed">
-  <title>Zamac Füds — Party Jollof, Small Chops & More</title>
+  <title>Zammath Consulting — Zamac Füds Food, Catering & Training</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -847,6 +847,29 @@
       padding: 30px 0
     }
 
+    .catalog-status {
+      margin: -6px 0 20px;
+      padding: 12px 14px;
+      border-radius: 6px;
+      background: var(--lime);
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.6
+    }
+
+    .catalog-status.demo {
+      background: #fff0dc;
+      color: #70471d
+    }
+
+    .form-trap {
+      position: absolute !important;
+      left: -10000px !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+    }
+
     .cart-item-copy {
       display: grid;
       gap: 4px;
@@ -1509,7 +1532,8 @@
       }
 
       .brand {
-        font-size: 23px
+        font-size: 18px;
+        letter-spacing: -.8px
       }
 
       .links {
@@ -1780,7 +1804,7 @@
       <button class="icon-btn menu-toggle" aria-label="Open menu" id="menuBtn"><svg viewBox="0 0 24 24">
           <path d="M4 7h16M4 12h16M4 17h16" />
         </svg></button>
-      <a class="brand" href="#">zamac <em>füds</em></a>
+      <a class="brand" href="#">ZAMMATH <em>CONSULTING</em></a>
       <nav class="links" id="navLinks"><a href="#shop">Menu</a><a href="#categories">Categories</a><a
           href="#booking">Bookings</a><a href="#training">Training</a><a href="#contact">Contact</a></nav>
       <div class="nav-actions">
@@ -1790,6 +1814,10 @@
           </svg><span class="label">Search</span></button>
         <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Switch to dark mode"
           title="Switch theme"><span id="themeIcon">☾</span><span class="label" id="themeLabel">Dark</span></button>
+        <button class="icon-btn" id="accountToggle" aria-label="Open your account"><svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+          </svg><span class="label">Account</span></button>
         <button class="icon-btn" id="cartToggle" aria-label="Open cart"><svg viewBox="0 0 24 24">
             <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L21 8H6" />
             <circle cx="10" cy="21" r="1" />
@@ -1852,6 +1880,7 @@
           <h2>Customer favourites</h2>
         </div><a class="text-link" href="#shop" id="showAll">Shop all products&nbsp; →</a>
       </div>
+      <p class="catalog-status" id="catalogStatus" role="status" aria-live="polite">Loading the live menu…</p>
       <div class="products" id="products"></div>
     </section>
     <section class="training-section" id="training">
@@ -1899,6 +1928,8 @@
         splits the full fee into equal instalments. Training completion certificates are not a substitute for an
         accredited professional qualification or licence.</p>
       <form class="glass-form training-form" id="trainingForm">
+        <label class="form-trap" aria-hidden="true">Leave this field empty<input name="website" tabindex="-1"
+            autocomplete="off"></label>
         <div class="form-heading">
           <div class="eyebrow">Start learning</div>
           <h3>Request a training place</h3>
@@ -1930,6 +1961,8 @@
             Office events</span></div>
       </div>
       <form class="glass-form booking-form" id="bookingForm">
+        <label class="form-trap" aria-hidden="true">Leave this field empty<input name="website" tabindex="-1"
+            autocomplete="off"></label>
         <h3>Book your occasion</h3>
         <div class="form-grid"><label>Your name<input name="name" autocomplete="name" required
               maxlength="120"></label><label>Email address<input name="email" type="email" autocomplete="email" required
@@ -1978,12 +2011,14 @@
       <div class="contact-copy">
         <div class="eyebrow">We’re here to help</div>
         <h2>Say hello.</h2>
-        <p>Questions about the menu, a catering date, or a training course? Send us a note and our team will get back to
-          you.</p>
+        <p>Questions about the menu, delivery arrangements, a catering date, or a training course? Send us a note and
+          our team will get back to you with the details.</p>
         <div class="contact-points"><span>🍽️ Menu & orders</span><span>🎉 Catering & bookings</span><span>📚 Training
             enquiries</span></div>
       </div>
       <form class="glass-form contact-form" id="contactForm">
+        <label class="form-trap" aria-hidden="true">Leave this field empty<input name="website" tabindex="-1"
+            autocomplete="off"></label>
         <h3>Contact Zamac Füds</h3>
         <div class="form-grid"><label>Your name<input name="name" autocomplete="name" required
               maxlength="120"></label><label>Email address<input name="email" type="email" autocomplete="email" required
@@ -2001,20 +2036,23 @@
     <section class="newsletter">
       <h2>Good food, straight to your inbox</h2>
       <p>New menu favourites, special offers, and updates from Zamac Füds.</p>
-      <form class="email-form" id="emailForm"><input type="email" placeholder="Your email address"
-          aria-label="Your email address" required><button>Sign me up</button></form>
+      <form class="email-form" id="emailForm"><label class="form-trap" aria-hidden="true">Leave this field empty<input
+            name="website" tabindex="-1" autocomplete="off"></label><input type="email" name="email"
+          placeholder="Your email address" aria-label="Your email address" autocomplete="email" maxlength="254"
+          required><button type="submit">Sign me up</button></form>
+      <p class="form-message" id="newsletterMessage" role="status" aria-live="polite"></p>
     </section>
   </main>
   <footer id="footer">
     <div class="footer-main">
       <div>
-        <div class="footer-brand">zamac <em>füds</em></div>
-        <p>Big flavour, generous portions, and good food made to bring people together.</p>
+        <div class="footer-brand">Zammath <em>Consulting</em></div>
+        <p>Parent company of Zamac Füds.</p>
       </div>
       <div class="footer-links">
         <div><strong>Explore</strong><a href="#shop">Shop all</a><a href="#categories">Categories</a><a
             href="#catering">Catering</a></div>
-        <div><strong>Here to help</strong><a href="#footer">Delivery info</a><a href="#contact">Get in touch</a>
+        <div><strong>Here to help</strong><a href="#contact">Delivery info</a><a href="#contact">Get in touch</a>
           <strong class="social-heading">Follow along</strong>
           <div class="social-icons" aria-label="Social media">
             <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
@@ -2037,7 +2075,7 @@
         </div>
       </div>
     </div>
-    <div class="copyright"><span>© 2026 Zamac Füds. Made for good living.</span><span>Good food, good feeling.</span>
+    <div class="copyright"><span>© 2026 Zammath Consulting.</span><span>Zamac Füds — good food, good feeling.</span>
     </div>
   </footer>
   <div class="overlay" id="overlay"></div>
@@ -2077,6 +2115,11 @@
       <button type="button" class="google-login" id="googleSignIn">🇬 Continue with Google</button>
       <p class="auth-note">Sign in to attach your order to your account.</p>
     </div>
+    <div id="accountPanel" hidden>
+      <p id="accountSummary"></p>
+      <button type="button" class="google-login" id="accountGoogleSignIn">🇬 Continue with Google</button>
+      <button type="button" class="google-login" id="accountSignOut">Sign out</button>
+    </div>
     <form id="checkoutForm" class="checkout-fields"><label id="nameField">Full name<input name="name"
           autocomplete="name" maxlength="120"></label><label id="emailField">Email address<input name="email"
           type="email" autocomplete="email" maxlength="254"></label><label>Delivery address<textarea name="address"
@@ -2099,8 +2142,9 @@
     <p class="fine-print" style="margin:20px auto 0">Payments are verified with Paystack before a training instalment is
       marked as paid.</p>
   </section>
+  <script src="/assets/catalog.js"></script>
   <script>
-    let products = [
+    const demoProducts = [
       { id: 1, name: 'Zamac classic burger', category: 'Meals', size: 'Beef · lettuce · house sauce', price: 12500, rating: '4.9', badge: 'Best seller', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=88', description: 'Juicy grilled beef, crisp lettuce, ripe tomato and our house sauce in a toasted brioche bun.' },
       { id: 2, name: 'Crispy chicken burger', category: 'Chicken', size: 'Buttermilk · slaw · 1 piece', price: 10500, rating: '4.8', badge: 'Customer fave', image: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=900&q=88', description: 'Crunchy buttermilk chicken with fresh slaw and a little heat, served in a soft toasted bun.' },
       { id: 3, name: 'Smoky party jollof, chicken & dodo', category: 'Rice dishes', size: 'Party jollof · grilled chicken · plantain', price: 16500, rating: '5.0', badge: 'Party favourite', image: 'https://margaretafrica.com/cdn/shop/articles/jollof-rice_42d1dec8-3d61-43c9-82a3-2ff07735cefb.jpg?v=1749490501&width=1920', description: 'Nigerian party jollof with deep tomato colour and smoky firewood flavour, served with pepper grilled chicken, sweet fried plantain (dodo), slaw and pepper sauce.' },
@@ -2126,27 +2170,97 @@
       { id: 23, name: 'Banana puff puff box', category: 'Pastries', size: '12 pieces · ripe banana', price: 6000, rating: '4.8', badge: 'Naturally sweet', image: 'https://9jafoodie.com/wp-content/uploads/2011/04/Nigerian-Puff-Puff-Recipe.jpg', description: 'Golden, airy puff puff folded with ripe banana for a soft, naturally sweet bite.' },
       { id: 24, name: 'Onion puff puff box', category: 'Pastries', size: '12 pieces · savoury', price: 6000, rating: '4.8', badge: 'Savoury twist', image: 'https://9jafoodie.com/wp-content/uploads/2011/04/Nigerian-Puff-Puff-Recipe.jpg', description: 'A savoury puff puff variation with finely chopped onion folded through the light dough.' }
     ];
-    let cart = []; try { const storedCart = JSON.parse(localStorage.getItem('zamac-cart') || '[]'); if (Array.isArray(storedCart)) cart = storedCart.reduce((items, saved) => { const product = products.find(p => p.id === Number(saved.id)), qty = Number(saved.qty); if (product && Number.isInteger(qty) && qty > 0 && qty <= 100) items.push({ ...product, qty }); return items; }, []); } catch (_) { cart = []; }
+    let products = [];
+    let catalogState = 'loading';
+    let catalogReady = false;
+    let savedCart = [];
+    try {
+      const value = JSON.parse(localStorage.getItem('zamac-cart') || '[]');
+      if (Array.isArray(value)) savedCart = value;
+    } catch (_) { savedCart = []; }
+    let cart = [];
     let activeProduct = null; let categoryFilter = ''; let searchTerm = '';
     let authEnabled = false, paymentsEnabled = false, supabaseClient = null, supabaseSession = null;
-    const authReady = (async () => { try { const response = await fetch('/api/config'); const config = await response.json(); authEnabled = !!config.authEnabled; paymentsEnabled = !!config.paymentsEnabled; if (authEnabled && window.supabase) { supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey); supabaseClient.auth.onAuthStateChange((_event, session) => { supabaseSession = session; syncCheckoutAuth() }); const sessionResult = await supabaseClient.auth.getSession(); supabaseSession = sessionResult.data.session; } const menuResponse = await fetch('/api/products'); if (menuResponse.ok) { const rows = await menuResponse.json(); if (Array.isArray(rows) && rows.length) { const saved = new Map(rows.map(p => [Number(p.id), p])); products = products.map(base => { const p = saved.get(base.id); return p ? { ...p, ...base, price: Number(p.price_minor) / 100 } : base; }); cart = cart.map(item => { const latest = products.find(p => p.id === item.id); return latest ? { ...latest, qty: item.qty } : item }); renderCart(); } } } catch (_) { } renderProducts(); syncCheckoutAuth(); return true; })();
+    const authReady = (async () => {
+      try {
+        const response = await fetch('/api/config');
+        if (!response.ok) throw new Error('Shop configuration is unavailable.');
+        const config = await response.json();
+        authEnabled = !!config.authEnabled;
+        paymentsEnabled = !!config.paymentsEnabled;
+        if (authEnabled && window.supabase) {
+          supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+          supabaseClient.auth.onAuthStateChange((_event, session) => { supabaseSession = session; syncCheckoutAuth(); });
+          const sessionResult = await supabaseClient.auth.getSession();
+          supabaseSession = sessionResult.data.session;
+        }
+      } catch (_) {
+        authEnabled = false;
+        paymentsEnabled = false;
+      }
+      try {
+        products = await ZamacCatalog.loadProducts(fetch);
+        catalogState = products.length ? 'live' : 'empty';
+      } catch (_) {
+        products = demoProducts;
+        catalogState = 'demo';
+      }
+      cart = savedCart.reduce((items, saved) => {
+        const product = products.find(item => item.id === Number(saved.id));
+        const qty = Number(saved.qty);
+        if (product && Number.isInteger(qty) && qty > 0 && qty <= 100) items.push({ ...product, qty });
+        return items;
+      }, []);
+      catalogReady = true;
+      renderCatalogStatus();
+      renderProducts();
+      renderCart();
+      syncCheckoutAuth();
+      return true;
+    })();
     const productGrid = document.getElementById('products');
     const money = n => new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 }).format(n);
     function imageFailed(image) { if (image.dataset.fallbackApplied) return; image.dataset.fallbackApplied = 'true'; const title = (image.alt || 'Freshly made').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c])); const kind = `${image.dataset.kind || ''} ${title}`.toLowerCase(); let dish = '<ellipse cx="400" cy="330" rx="190" ry="110" fill="#b94f2f"/><ellipse cx="355" cy="300" rx="72" ry="35" fill="#d79043"/><ellipse cx="470" cy="345" rx="80" ry="38" fill="#d8a543"/><circle cx="300" cy="345" r="13" fill="#71894e"/><circle cx="520" cy="290" r="12" fill="#71894e"/>'; if (kind.includes('drink') || kind.includes('zobo') || kind.includes('lemonade')) { const drink = kind.includes('zobo') ? '#9c2741' : '#edc54e'; dish = `<rect x="340" y="185" width="120" height="230" rx="18" fill="#fff" fill-opacity=".78" stroke="#fff" stroke-width="10"/><path d="M350 270h100v128a8 8 0 0 1-8 8h-84a8 8 0 0 1-8-8z" fill="${drink}"/><circle cx="475" cy="220" r="35" fill="#e9cb5c"/><path d="M475 220l27-14" stroke="#fff" stroke-width="7"/>`; } else if (kind.includes('pastries') || kind.includes('puff') || kind.includes('cupcake') || kind.includes('pie')) { dish = kind.includes('cupcake') ? '<path d="M295 300h210l-28 120H323z" fill="#cf8b62"/><path d="M302 300c-20-72 77-97 93-46 20-77 115-45 101 1 52 12 43 58 15 45z" fill="#e9a6a5"/><circle cx="405" cy="278" r="12" fill="#c54c43"/><circle cx="447" cy="287" r="10" fill="#f2cf66"/>' : '<circle cx="315" cy="300" r="54" fill="#cb8040"/><circle cx="420" cy="275" r="62" fill="#df9c50"/><circle cx="515" cy="315" r="52" fill="#bd7135"/><circle cx="370" cy="370" r="48" fill="#d58e42"/><circle cx="475" cy="375" r="48" fill="#e0a14f"/>'; } else if (kind.includes('egusi') || kind.includes('soup')) { dish = '<ellipse cx="400" cy="335" rx="160" ry="96" fill="#d87931"/><ellipse cx="400" cy="330" rx="125" ry="65" fill="#bd5429"/><circle cx="350" cy="310" r="22" fill="#446341"/><circle cx="420" cy="350" r="20" fill="#4e7042"/><ellipse cx="560" cy="385" rx="66" ry="48" fill="#f1e6cf"/>'; } const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 650"><defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#e8dfc9"/><stop offset="1" stop-color="#c5d0b4"/></linearGradient><radialGradient id="plate"><stop stop-color="#fff"/><stop offset="1" stop-color="#eee9df"/></radialGradient></defs><rect width="800" height="650" fill="url(#bg)"/><circle cx="685" cy="115" r="90" fill="#fff" fill-opacity=".2"/><ellipse cx="400" cy="344" rx="238" ry="157" fill="#758069" fill-opacity=".22"/><ellipse cx="400" cy="325" rx="230" ry="150" fill="url(#plate)"/><ellipse cx="400" cy="325" rx="190" ry="112" fill="#f7f2e9"/>${dish}<text x="400" y="555" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#273b2b">${title}</text><text x="400" y="590" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" letter-spacing="4" fill="#62735a">ZAMAC FÜDS · FRESHLY MADE</text></svg>`; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`; }
-    function renderProducts() { const order = { Meals: 0, Chicken: 1, 'Rice dishes': 2, Continental: 3, Sides: 4, Pastries: 5, Drinks: 6, 'Events / Catering': 7 }; const list = products.filter(p => (!categoryFilter || p.category === categoryFilter) && (!searchTerm || (p.name + ' ' + p.category + ' ' + p.description).toLowerCase().includes(searchTerm.toLowerCase()))).sort((a, b) => (order[a.category] ?? 99) - (order[b.category] ?? 99) || a.id - b.id); productGrid.innerHTML = list.length ? list.map(p => `<article class="product"><div class="product-image"><img src="${p.image}" data-kind="${p.category}" alt="${p.name}" onerror="imageFailed(this)" loading="lazy"><span class="badge">${p.badge}</span><button class="heart" aria-label="Save ${p.name}" onclick="this.classList.toggle('active');this.textContent=this.classList.contains('active')?'♥':'♡'">♡</button></div><div class="product-info"><div class="product-top"><h3>${p.name}</h3><span class="price">${money(p.price)}</span></div><div class="product-meta"><span>${p.size}</span><span class="category-tag">${p.category}</span></div><button class="add-btn" onclick="addToCart(${p.id})">Add to basket&nbsp; +</button><button class="add-btn" style="margin-top:6px" onclick="showDetails(${p.id})">View details</button></div></article>`).join('') : '<div class="no-results">No fresh finds match that search. Try another word.</div>'; }
+    function escapeHTML(value) { return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character])); }
+    function renderCatalogStatus() {
+      const status = document.getElementById('catalogStatus');
+      if (catalogState === 'live') { status.hidden = true; status.className = 'catalog-status'; status.textContent = ''; return; }
+      status.hidden = false;
+      status.className = `catalog-status ${catalogState}`;
+      status.textContent = catalogState === 'loading' ? 'Loading the live menu…' : catalogState === 'empty'
+        ? 'No active products are available right now.'
+        : 'Preview catalogue only — the live menu could not be loaded. These examples are not available to order.';
+    }
+    function renderProducts() {
+      if (catalogState === 'loading') { productGrid.innerHTML = ''; return; }
+      if (catalogState === 'empty') { productGrid.innerHTML = '<div class="no-results">No active products are available right now.</div>'; return; }
+      const order = { Meals: 0, Chicken: 1, 'Rice dishes': 2, Continental: 3, Sides: 4, Pastries: 5, Drinks: 6, 'Events / Catering': 7 };
+      const list = products.filter(p => (!categoryFilter || p.category === categoryFilter) && (!searchTerm || (p.name + ' ' + p.category + ' ' + p.description).toLowerCase().includes(searchTerm.toLowerCase()))).sort((a, b) => (order[a.category] ?? 99) - (order[b.category] ?? 99) || a.id - b.id);
+      productGrid.innerHTML = list.length ? list.map(p => `<article class="product"><div class="product-image"><img src="${escapeHTML(p.image)}" data-kind="${escapeHTML(p.category)}" alt="${escapeHTML(p.name)}" onerror="imageFailed(this)" loading="lazy"><span class="badge">${escapeHTML(p.badge)}</span><button class="heart" aria-label="Save ${escapeHTML(p.name)}" onclick="this.classList.toggle('active');this.textContent=this.classList.contains('active')?'♥':'♡'">♡</button></div><div class="product-info"><div class="product-top"><h3>${escapeHTML(p.name)}</h3><span class="price">${money(p.price)}</span></div><div class="product-meta"><span>${escapeHTML(p.size)}</span><span class="category-tag">${escapeHTML(p.category)}</span></div><button class="add-btn" ${catalogState !== 'live' ? 'disabled title="Preview only"' : `onclick="addToCart(${p.id})"`}>Add to basket&nbsp; +</button><button class="add-btn" style="margin-top:6px" onclick="showDetails(${p.id})">View details</button></div></article>`).join('') : '<div class="no-results">No fresh finds match that search. Try another word.</div>';
+    }
     function openCart() { renderCart(); document.getElementById('cartDrawer').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
-    function addToCart(id) { const p = products.find(x => x.id === Number(id)); if (!p) return; const found = cart.find(x => x.id === p.id); if (found) found.qty = Math.min(found.qty + 1, 100); else cart.push({ ...p, qty: 1 }); renderCart(); openCart(); showCartToast(`${p.name} added to your basket`); }
-    function changeQty(id, delta) { const item = cart.find(p => p.id === id); if (!item) return; item.qty += delta; if (item.qty <= 0) cart = cart.filter(p => p.id !== id); renderCart() }
+    function addToCart(id) { if (catalogState !== 'live') return; const p = products.find(x => x.id === Number(id)); if (!p) return; const found = cart.find(x => x.id === p.id); if (found && found.qty >= 100) { showCartToast('Maximum quantity is 100 per product'); return; } if (found) found.qty += 1; else cart.push({ ...p, qty: 1 }); renderCart(); openCart(); showCartToast(`${p.name} added to your basket`); }
+    function changeQty(id, delta) { const item = cart.find(p => p.id === id); if (!item) return; if (delta > 0 && item.qty >= 100) { showCartToast('Maximum quantity is 100 per product'); return; } item.qty += delta; if (item.qty <= 0) cart = cart.filter(p => p.id !== id); renderCart() }
     function showCartToast(message) { const toast = document.getElementById('cartToast'); toast.textContent = `${message} · View basket`; toast.classList.add('show'); clearTimeout(window.cartToastTimer); window.cartToastTimer = setTimeout(() => toast.classList.remove('show'), 2800) }
-    function renderCart() { try { localStorage.setItem('zamac-cart', JSON.stringify(cart)); } catch (_) { /* Keep this basket active for the current visit if browser storage is unavailable. */ } document.getElementById('cartCount').textContent = cart.reduce((n, p) => n + p.qty, 0); document.getElementById('cartItems').innerHTML = cart.length ? cart.map(p => `<div class="cart-item"><img src="${p.image}" data-kind="${p.category}" alt="${p.name}" onerror="imageFailed(this)"><div class="cart-item-copy"><strong>${p.name}</strong><small>${money(p.price)} each</small><div class="quantity-control"><button aria-label="Remove one ${p.name}" onclick="changeQty(${p.id},-1)">−</button><span>${p.qty}</span><button aria-label="Add one ${p.name}" onclick="changeQty(${p.id},1)">+</button></div></div><b>${money(p.qty * p.price)}</b><button class="remove" onclick="removeItem(${p.id})">Remove</button></div>`).join('') : '<div class="empty-cart">Your basket is looking lovely and empty. Add something fresh!</div>'; document.getElementById('subtotal').textContent = money(cart.reduce((n, p) => n + p.qty * p.price, 0)); document.getElementById('checkoutStart').disabled = cart.length === 0; }
+    function renderCart() {
+      if (catalogReady) {
+        try { localStorage.setItem('zamac-cart', JSON.stringify(cart)); } catch (_) { /* Keep this basket active for the current visit if browser storage is unavailable. */ }
+      }
+      document.getElementById('cartCount').textContent = cart.reduce((n, p) => n + p.qty, 0);
+      document.getElementById('cartItems').innerHTML = cart.length ? cart.map(p => `<div class="cart-item"><img src="${escapeHTML(p.image)}" data-kind="${escapeHTML(p.category)}" alt="${escapeHTML(p.name)}" onerror="imageFailed(this)"><div class="cart-item-copy"><strong>${escapeHTML(p.name)}</strong><small>${money(p.price)} each</small><div class="quantity-control"><button aria-label="Remove one ${escapeHTML(p.name)}" onclick="changeQty(${p.id},-1)">−</button><span>${p.qty}</span><button aria-label="Add one ${escapeHTML(p.name)}" ${p.qty >= 100 ? 'disabled title="Maximum quantity is 100"' : ''} onclick="changeQty(${p.id},1)">+</button></div></div><b>${money(p.qty * p.price)}</b><button class="remove" onclick="removeItem(${p.id})">Remove</button></div>`).join('') : '<div class="empty-cart">Your basket is looking lovely and empty. Add something fresh!</div>';
+      document.getElementById('subtotal').textContent = money(cart.reduce((n, p) => n + p.qty * p.price, 0));
+      document.getElementById('checkoutStart').disabled = cart.length === 0 || catalogState !== 'live';
+    }
     function removeItem(id) { cart = cart.filter(p => p.id !== id); renderCart() }
-    function showDetails(id) { activeProduct = products.find(p => p.id === id); const detailImage = document.getElementById('detailImage'); detailImage.dataset.fallbackApplied = ''; detailImage.dataset.kind = activeProduct.category; detailImage.src = activeProduct.image; detailImage.alt = activeProduct.name; document.getElementById('detailCategory').textContent = activeProduct.category; document.getElementById('detailName').textContent = activeProduct.name; document.getElementById('detailDescription').textContent = activeProduct.description; document.getElementById('detailPrice').textContent = money(activeProduct.price) + ' · ' + activeProduct.size; document.getElementById('detailModal').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+    function showDetails(id) { activeProduct = products.find(p => p.id === id); if (!activeProduct) return; const detailImage = document.getElementById('detailImage'); detailImage.dataset.fallbackApplied = ''; detailImage.dataset.kind = activeProduct.category; detailImage.src = activeProduct.image; detailImage.alt = activeProduct.name; document.getElementById('detailCategory').textContent = activeProduct.category; document.getElementById('detailName').textContent = activeProduct.name; document.getElementById('detailDescription').textContent = activeProduct.description; document.getElementById('detailPrice').textContent = money(activeProduct.price) + ' · ' + activeProduct.size; document.getElementById('detailAdd').disabled = catalogState !== 'live'; document.getElementById('detailModal').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
     function closeAll() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('detailModal').classList.remove('open'); document.getElementById('checkoutModal').classList.remove('open'); document.getElementById('overlay').classList.remove('show') }
-    let authMode = 'signin';
-    function syncCheckoutAuth() { const hasSession = !!supabaseSession; document.getElementById('googleLogin').hidden = !authEnabled || hasSession; document.getElementById('checkoutForm').hidden = !authEnabled || !hasSession; document.getElementById('nameField').hidden = authEnabled; document.getElementById('emailField').hidden = authEnabled; document.querySelector('#nameField input').required = !authEnabled; document.querySelector('#emailField input').required = !authEnabled; if (hasSession) { const metadata = supabaseSession.user.user_metadata || {}; document.querySelector('#nameField input').value = metadata.full_name || metadata.name || supabaseSession.user.email.split('@')[0]; document.querySelector('#emailField input').value = supabaseSession.user.email || ''; document.getElementById('checkoutIntro').textContent = `Signed in as ${supabaseSession.user.email}. Add your delivery address to continue.`; } else if (authEnabled) { document.getElementById('checkoutIntro').textContent = 'Sign in or create an account to place your order.'; } else { document.getElementById('checkoutIntro').textContent = 'Online checkout is temporarily unavailable because shop sign-in and database settings are incomplete. Please contact us to place your order.'; } }
+    let authMode = 'signin', modalPurpose = 'checkout';
+    function syncCheckoutAuth() { const hasSession = !!supabaseSession, accountMode = modalPurpose === 'account'; document.getElementById('checkoutTitle').textContent = accountMode ? 'Your account' : 'Checkout'; document.getElementById('googleLogin').hidden = !authEnabled || hasSession; document.getElementById('checkoutForm').hidden = accountMode || !authEnabled || !hasSession; document.getElementById('accountPanel').hidden = !accountMode || !hasSession; document.getElementById('nameField').hidden = authEnabled; document.getElementById('emailField').hidden = authEnabled; document.querySelector('#nameField input').required = !authEnabled; document.querySelector('#emailField input').required = !authEnabled; if (hasSession) { const metadata = supabaseSession.user.user_metadata || {}; document.querySelector('#nameField input').value = metadata.full_name || metadata.name || supabaseSession.user.email.split('@')[0]; document.querySelector('#emailField input').value = supabaseSession.user.email || ''; document.getElementById('checkoutIntro').textContent = `Signed in as ${supabaseSession.user.email}.`; document.getElementById('accountSummary').textContent = `You’re signed in as ${supabaseSession.user.email}.`; } else if (authEnabled) { document.getElementById('checkoutIntro').textContent = 'Sign in or create an account to place your order.'; } else { document.getElementById('checkoutIntro').textContent = accountMode ? 'Account sign-in is temporarily unavailable because shop authentication is not configured.' : 'Online checkout is temporarily unavailable because shop sign-in and database settings are incomplete. Please contact us to place your order.'; } }
     async function returnToShop(event) { event.preventDefault(); document.getElementById('orderConfirmation').hidden = true; document.querySelector('main').hidden = false; document.querySelector('footer').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' }); return false; }
     function applyTheme(theme) { document.body.classList.toggle('dark-mode', theme === 'dark'); localStorage.setItem('zamac-theme', theme); const dark = theme === 'dark'; document.getElementById('themeIcon').textContent = dark ? '☀' : '☾'; document.getElementById('themeLabel').textContent = dark ? 'Light' : 'Dark'; document.getElementById('themeToggle').setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} mode`); document.querySelector('meta[name="theme-color"]').content = dark ? '#111711' : '#f5f3ed' }
     function apiConnectionHelp() { if (location.protocol === 'file:') return 'This page was opened directly as a file. In the project folder, run “npm start”, then open Zamac Füds at http://localhost:8000.'; if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return 'The Zamac Füds shop server is not responding. Run “npm start” in the project folder, then refresh this page at http://localhost:8000.'; return 'We could not reach the shop’s form service. Your request has not been sent; please try again when the website is connected.'; }
+    function createCheckoutUuid() { if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID(); throw new Error('Secure checkout retry support is unavailable in this browser.'); }
+    function checkoutIdempotencyKey(userId, name, email, address, items) { const normalizedItems = items.map(({ id, qty }) => ({ id, qty })).sort((a, b) => a.id - b.id); const fingerprint = JSON.stringify({ userId, name: String(name).trim(), email: String(email).trim().toLowerCase(), address: String(address).trim(), items: normalizedItems }); const storageKey = 'zamac-checkout-attempt'; try { const previous = JSON.parse(localStorage.getItem(storageKey) || 'null'); if (previous?.fingerprint === fingerprint && /^[0-9a-f-]{36}$/i.test(previous.key)) return previous.key; const key = createCheckoutUuid(); localStorage.setItem(storageKey, JSON.stringify({ key, fingerprint })); return key; } catch (_) { throw new Error('Checkout retry protection needs browser storage. Enable site storage and try again.'); } }
     async function submitForm(event, endpoint, messageId, onSuccess) { event.preventDefault(); const form = event.currentTarget, button = form.querySelector('button[type="submit"]'), message = document.getElementById(messageId); button.disabled = true; const oldText = button.textContent; button.textContent = 'Sending…'; message.textContent = ''; message.className = 'form-message'; try { const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form))) }); const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Please try again.'); form.reset(); message.textContent = onSuccess ? await onSuccess(result) : result.message; button.textContent = oldText; } catch (error) { message.textContent = error instanceof TypeError ? apiConnectionHelp() : (error.message || 'Could not submit the form. Please try again.'); message.classList.add('error'); button.textContent = oldText; } finally { button.disabled = false; } }
     async function beginTrainingPayment(enrollmentId, installment, paymentToken) { const response = await fetch('/api/training-payments/initialize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enrollmentId, installmentNumber: installment, paymentToken }) }); const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Could not start payment.'); window.location.assign(result.authorizationUrl); }
     async function showTrainingPaymentReturn() { const params = new URLSearchParams(window.location.search); if (params.get('training_payment') !== 'verify') return; const reference = params.get('reference') || ''; const token = localStorage.getItem('zamac-training-token') || ''; let result = null; try { const response = await fetch('/api/training-payments/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reference, paymentToken: token }) }); result = await response.json(); if (!response.ok) throw new Error(result.error || 'Could not verify payment.'); } catch (error) { result = { paid: false, message: error.message, installment: 1, enrollmentId: localStorage.getItem('zamac-training-enrollment') }; } history.replaceState({}, '', window.location.pathname); document.querySelector('main').hidden = true; document.querySelector('footer').hidden = true; document.getElementById('trainingPaymentScreen').hidden = false; const action = document.getElementById('trainingPaymentAction'); action.hidden = false; action.onclick = () => beginTrainingPayment(result.enrollmentId, result.paid ? result.installment + 1 : result.installment, token).catch(error => { document.getElementById('trainingPaymentText').textContent = error.message }); if (result.paid) { document.getElementById('trainingPaymentTitle').textContent = 'Payment received'; document.getElementById('trainingPaymentText').textContent = `Instalment ${result.installment} for training request #${result.enrollmentId} is confirmed.${result.nextAmount ? ` Your balance is ${money(result.nextAmount / 100)}.` : ' Your training fees are now paid in full.'}`; action.hidden = !result.nextAmount; action.textContent = 'Pay the second instalment&nbsp; →'; } else { document.getElementById('trainingPaymentTitle').textContent = 'Payment not confirmed'; document.getElementById('trainingPaymentText').textContent = result.message || 'Paystack has not confirmed this instalment. You can try again.'; action.textContent = 'Try payment again&nbsp; →'; } }
@@ -2154,12 +2268,92 @@
     function updateTrainingPayment() { const program = document.getElementById('trainingProgram').value, summary = document.getElementById('trainingPayment'); if (!program) { summary.textContent = 'Select a course to see the first instalment.'; return; } const fees = programFees[program], total = fees.tuition + fees.materials, first = Math.ceil(total / 2); summary.textContent = `Total ${money(total)} including materials · first payment ${money(first)} · balance ${money(total - first)}.`; }
     document.getElementById('cartToggle').onclick = openCart; document.getElementById('closeCart').onclick = closeAll; document.getElementById('overlay').onclick = closeAll; document.getElementById('closeDetail').onclick = closeAll; document.getElementById('detailAdd').onclick = () => { if (activeProduct) addToCart(activeProduct.id); document.getElementById('detailModal').classList.remove('open') };
     document.getElementById('searchToggle').onclick = () => { const wrap = document.getElementById('searchWrap'); wrap.classList.toggle('open'); if (wrap.classList.contains('open')) document.getElementById('searchInput').focus() }; document.getElementById('searchInput').addEventListener('input', e => { searchTerm = e.target.value; categoryFilter = ''; renderProducts() });
-    document.getElementById('checkoutStart').onclick = async () => { if (!cart.length) return; await authReady; document.getElementById('cartDrawer').classList.remove('open'); const modal = document.getElementById('checkoutModal'); document.getElementById('checkoutTitle').textContent = 'Checkout'; document.getElementById('checkoutDone').hidden = true; document.getElementById('checkoutMessage').textContent = ''; const orderButton = document.getElementById('placeOrder'); orderButton.disabled = false; orderButton.innerHTML = 'Place order&nbsp; →'; syncCheckoutAuth(); document.getElementById('checkoutModal').classList.add('open'); document.getElementById('overlay').classList.add('show') }; document.getElementById('closeCheckout').onclick = closeAll;
-    document.getElementById('googleSignIn').onclick = async () => { await authReady; const message = document.getElementById('checkoutMessage'); if (!supabaseClient) { message.textContent = 'Google sign-in could not load. Refresh the page and try again.'; message.className = 'checkout-error'; return; } const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } }); if (error) { message.textContent = error.message; message.className = 'checkout-error'; } };
+    document.getElementById('checkoutStart').onclick = async () => {
+      if (!cart.length || catalogState !== 'live') return;
+      await authReady;
+      if (catalogState !== 'live') return;
+      modalPurpose = 'checkout';
+      document.getElementById('cartDrawer').classList.remove('open');
+      const modal = document.getElementById('checkoutModal');
+      document.getElementById('checkoutTitle').textContent = 'Checkout';
+      document.getElementById('checkoutDone').hidden = true;
+      document.getElementById('checkoutMessage').textContent = '';
+      const orderButton = document.getElementById('placeOrder');
+      orderButton.disabled = false;
+      orderButton.innerHTML = 'Place order&nbsp; →';
+      syncCheckoutAuth();
+      modal.classList.add('open');
+      document.getElementById('overlay').classList.add('show');
+    };
+    document.getElementById('accountToggle').onclick = async () => {
+      await authReady;
+      modalPurpose = 'account';
+      document.getElementById('checkoutDone').hidden = true;
+      document.getElementById('checkoutMessage').textContent = '';
+      syncCheckoutAuth();
+      document.getElementById('checkoutModal').classList.add('open');
+      document.getElementById('overlay').classList.add('show');
+    };
+    document.getElementById('closeCheckout').onclick = closeAll;
+
+    async function startGoogleSignIn() { await authReady; const message = document.getElementById('checkoutMessage'); if (!supabaseClient) { message.textContent = 'Google sign-in could not load. Refresh the page and try again.'; message.className = 'checkout-error'; return; } const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } }); if (error) { message.textContent = error.message; message.className = 'checkout-error'; } }
+    document.getElementById('googleSignIn').onclick = startGoogleSignIn;
+    document.getElementById('accountGoogleSignIn').onclick = startGoogleSignIn;
+    document.getElementById('accountSignOut').onclick = async () => { const message = document.getElementById('checkoutMessage'); if (!supabaseClient) { message.textContent = 'Account sign-out is unavailable right now.'; message.className = 'checkout-error'; return; } const { error } = await supabaseClient.auth.signOut(); if (error) { message.textContent = error.message || 'Could not sign out. Please try again.'; message.className = 'checkout-error'; return; } supabaseSession = null; syncCheckoutAuth(); message.textContent = 'You have been signed out.'; };
     function renderAuthMode() { document.getElementById('emailAuthSubmit').textContent = authMode === 'signin' ? 'Sign in' : 'Create account'; document.getElementById('authPassword').autocomplete = authMode === 'signin' ? 'current-password' : 'new-password'; document.getElementById('authSwitchText').innerHTML = authMode === 'signin' ? 'New to Zamac Füds? <button type="button" class="auth-switch" id="authModeToggle">Create an account</button>' : 'Already have an account? <button type="button" class="auth-switch" id="authModeToggle">Sign in</button>'; }
     document.getElementById('authSwitchText').addEventListener('click', event => { if (event.target.id !== 'authModeToggle') return; authMode = authMode === 'signin' ? 'signup' : 'signin'; renderAuthMode(); });
     document.getElementById('emailAuthForm').addEventListener('submit', async event => { event.preventDefault(); await authReady; const message = document.getElementById('checkoutMessage'), button = document.getElementById('emailAuthSubmit'); if (!supabaseClient) { message.textContent = 'Account sign-in is unavailable. Configure Supabase and try again.'; message.className = 'checkout-error'; return; } button.disabled = true; message.textContent = ''; message.className = ''; const email = document.getElementById('authEmail').value.trim(), password = document.getElementById('authPassword').value; try { const result = authMode === 'signin' ? await supabaseClient.auth.signInWithPassword({ email, password }) : await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: window.location.href } }); if (result.error) throw result.error; if (authMode === 'signup' && !result.data.session) { message.textContent = 'Account created. Check your email to confirm it, then sign in here.'; } else { supabaseSession = result.data.session; syncCheckoutAuth(); message.textContent = supabaseSession ? 'You’re signed in. Add your delivery address to continue.' : 'Sign-in complete.'; } } catch (error) { message.textContent = error.message || 'Could not sign in. Please try again.'; message.className = 'checkout-error'; } finally { button.disabled = false; } });
-    document.getElementById('checkoutForm').addEventListener('submit', async e => { e.preventDefault(); const button = document.getElementById('placeOrder'), message = document.getElementById('checkoutMessage'); button.disabled = true; button.textContent = 'Saving your order…'; message.textContent = ''; message.className = ''; try { await authReady; if (!authEnabled) throw new Error('Online checkout is unavailable because shop sign-in and database settings are incomplete. Please contact us to place your order.'); const user = supabaseSession?.user; if (!user) throw new Error('Your sign-in has expired. Please sign in again before placing your order.'); const form = new FormData(e.currentTarget); const name = (user.user_metadata || {}).full_name || (user.user_metadata || {}).name || user.email.split('@')[0]; const payload = { name, email: user.email, address: form.get('address'), items: cart.map(({ id, qty }) => ({ id, qty })) }; const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${supabaseSession.access_token}` }; const response = await fetch('/api/checkout', { method: 'POST', headers, body: JSON.stringify(payload) }); const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Checkout failed'); cart = []; renderCart(); localStorage.removeItem('zamac-cart'); closeAll(); document.getElementById('checkoutForm').reset(); document.querySelector('main').hidden = true; document.querySelector('footer').hidden = true; document.getElementById('confirmationText').textContent = `Order #${result.orderId} has been saved for ${result.customerName || name}. Total: ${money(result.total / 100)}.`; document.getElementById('confirmationEmail').textContent = result.emailSent ? `A confirmation email has been sent to ${result.email || payload.email}.` : 'Your order was saved, but the confirmation email could not be sent. Please contact us if you need help.'; document.getElementById('orderConfirmation').hidden = false; window.scrollTo(0, 0); } catch (err) { message.textContent = err instanceof TypeError ? apiConnectionHelp() : err.message; message.className = 'checkout-error'; button.disabled = false; button.innerHTML = 'Place order&nbsp; →'; } });
+    document.getElementById('checkoutForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = document.getElementById('placeOrder'), message = document.getElementById('checkoutMessage');
+      button.disabled = true;
+      button.textContent = 'Saving your order…';
+      message.textContent = '';
+      message.className = '';
+      try {
+        await authReady;
+        if (!authEnabled || catalogState !== 'live') throw new Error('Checkout is unavailable until sign-in and the live menu are ready.');
+        if (!supabaseClient) throw new Error('Your sign-in is unavailable. Please refresh the page and try again.');
+        const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+        if (sessionError) throw new Error('We could not confirm your sign-in. Please sign in again before placing your order.');
+        const session = sessionData.session;
+        supabaseSession = session;
+        syncCheckoutAuth();
+        const user = session?.user;
+        if (!user || !session.access_token) throw new Error('Your sign-in has expired. Please sign in again before placing your order.');
+        const form = new FormData(event.currentTarget);
+        const name = (user.user_metadata || {}).full_name || (user.user_metadata || {}).name || user.email.split('@')[0];
+        const items = cart.map(({ id, qty }) => ({ id, qty }));
+        const payload = { name, email: user.email, address: form.get('address'), items };
+        payload.idempotencyKey = checkoutIdempotencyKey(user.id, payload.name, payload.email, payload.address, items);
+        const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` };
+        const response = await fetch('/api/checkout', { method: 'POST', headers, body: JSON.stringify(payload) });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Checkout failed');
+        cart = [];
+        renderCart();
+        localStorage.removeItem('zamac-cart');
+        localStorage.removeItem('zamac-checkout-attempt');
+        closeAll();
+        document.getElementById('checkoutForm').reset();
+        document.querySelector('main').hidden = true;
+        document.querySelector('footer').hidden = true;
+        document.getElementById('confirmationText').textContent = `Order #${result.orderId} has been saved for ${result.customerName || name}. Total: ${money(result.total / 100)}.`;
+        document.getElementById('confirmationEmail').textContent = result.emailSent
+          ? `A confirmation email has been sent to ${result.email || user.email}.`
+          : result.emailStatus === 'pending'
+            ? 'Your order is saved. Its confirmation email is still being processed.'
+            : 'Your order was saved, but the confirmation email could not be sent. Please contact us if you need help.';
+        document.getElementById('orderConfirmation').hidden = false;
+        window.scrollTo(0, 0);
+      } catch (error) {
+        message.textContent = error instanceof TypeError ? apiConnectionHelp() : (error.message || 'Checkout failed.');
+        message.className = 'checkout-error';
+        button.disabled = false;
+        button.innerHTML = 'Place order&nbsp; →';
+      }
+    });
+
     document.getElementById('themeToggle').onclick = () => applyTheme(document.body.classList.contains('dark-mode') ? 'light' : 'dark'); applyTheme(localStorage.getItem('zamac-theme') || 'light');
     document.getElementById('cartToast').onclick = () => document.getElementById('cartToggle').click();
     document.getElementById('trainingProgram').addEventListener('change', updateTrainingPayment);
@@ -2169,7 +2363,8 @@
     document.getElementById('contactForm').addEventListener('submit', event => submitForm(event, '/api/contact', 'contactMessage', result => `Message #${result.id} sent. Our team will get back to you.`));
     const eventDateInput = document.querySelector('#bookingForm input[name="event_date"]'); eventDateInput.min = new Date().toISOString().slice(0, 10);
     authReady.then(showTrainingPaymentReturn);
-    document.querySelectorAll('.category').forEach(el => el.addEventListener('click', () => { categoryFilter = el.dataset.category; searchTerm = ''; document.getElementById('searchInput').value = ''; renderProducts() })); document.getElementById('showAll').onclick = () => { categoryFilter = ''; searchTerm = ''; document.getElementById('searchInput').value = ''; renderProducts() }; document.getElementById('menuBtn').onclick = () => document.getElementById('navLinks').classList.toggle('mobile-open'); document.getElementById('emailForm').onsubmit = e => { e.preventDefault(); e.target.innerHTML = '<p style="color:var(--green);font-weight:700">Thanks for joining us — keep an eye on your inbox!</p>' };
+    document.querySelectorAll('.category').forEach(el => el.addEventListener('click', () => { categoryFilter = el.dataset.category; searchTerm = ''; document.getElementById('searchInput').value = ''; renderProducts() })); document.getElementById('showAll').onclick = () => { categoryFilter = ''; searchTerm = ''; document.getElementById('searchInput').value = ''; renderProducts() }; document.getElementById('menuBtn').onclick = () => document.getElementById('navLinks').classList.toggle('mobile-open');
+    document.getElementById('emailForm').addEventListener('submit', async event => { event.preventDefault(); const form = event.currentTarget, button = form.querySelector('button[type="submit"]'), message = document.getElementById('newsletterMessage'); if (button.disabled) return; button.disabled = true; const oldText = button.textContent; button.textContent = 'Sending…'; message.textContent = ''; message.className = 'form-message'; try { const response = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form))) }); const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Could not subscribe. Please try again.'); form.reset(); message.textContent = result.message || 'Thanks for subscribing.'; } catch (error) { message.textContent = error instanceof TypeError ? apiConnectionHelp() : (error.message || 'Could not subscribe. Please try again.'); message.classList.add('error'); } finally { button.disabled = false; button.textContent = oldText; } });
     renderProducts(); renderCart(); renderAuthMode(); syncCheckoutAuth();
   </script>
 </body>
