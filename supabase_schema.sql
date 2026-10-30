@@ -107,6 +107,12 @@ create table if not exists public.contact_messages (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.newsletter_subscribers (
+  email text primary key,
+  subscribed_at timestamptz not null default now(),
+  constraint newsletter_subscribers_email_valid check (email ~* '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$')
+);
+
 insert into public.training_programs (code,title,description,duration,course_fee_minor,materials_fee_minor,materials) values
  ('chef','Professional Chef Training','Practical Nigerian and continental cooking, kitchen safety, menu costing and food presentation.','6 weeks',24000000,6500000,'Chef jacket and apron, knife kit, recipe workbook, pantry starter pack'),
  ('nutrition','Nutrition & Dietetics Foundations','Nutrition basics, balanced menu planning, food hygiene and healthy cooking practice.','8 weeks',28000000,4500000,'Nutrition workbook, portion guide, menu-planning cards, measuring kit')
@@ -153,13 +159,31 @@ alter table public.training_programs enable row level security;
 alter table public.training_enrollments enable row level security;
 alter table public.training_payments enable row level security;
 alter table public.contact_messages enable row level security;
+alter table public.newsletter_subscribers enable row level security;
 
 grant usage on schema public to anon, authenticated, service_role;
 grant select on public.products to anon, authenticated;
 grant select on public.users, public.orders, public.order_items to authenticated;
 grant select, insert, update, delete on public.cart_items to authenticated;
 grant all on public.users, public.products, public.cart_items, public.orders, public.order_items, public.bookings, public.training_programs, public.training_enrollments, public.training_payments, public.contact_messages to service_role;
+grant all on public.newsletter_subscribers to service_role;
 grant usage, select on all sequences in schema public to service_role;
+
+create or replace function public.subscribe_newsletter(p_email text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.newsletter_subscribers (email)
+  values (lower(trim(p_email)))
+  on conflict (email) do nothing;
+  return true;
+end;
+$$;
+revoke all on function public.subscribe_newsletter(text) from public, anon, authenticated;
+grant execute on function public.subscribe_newsletter(text) to service_role;
 
 drop policy if exists "Active menu is public" on public.products;
 drop policy if exists "Customers read own profile" on public.users;

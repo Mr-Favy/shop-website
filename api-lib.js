@@ -21,6 +21,21 @@ function requireSupabase() {
   return settings;
 }
 
+function sanitizeSupabaseMessage(value) {
+  if (typeof value !== 'string') return 'No provider message returned.';
+  return value
+    .replace(/\bBearer\s+\S+/gi, 'Bearer [redacted]')
+    .replace(/\b(?:sb_secret_|eyJ)[A-Za-z0-9._-]+/g, '[redacted token]')
+    .replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, '[redacted email]')
+    .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi, '[redacted id]')
+    .replace(/\bKey\s*\([^)]*\)\s*=\s*\([^)]*\)/gi, 'Key ([redacted])')
+    .replace(/'[^']*'|"[^"]*"/g, '"[redacted]"')
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+    .slice(0, 300) || 'No provider message returned.';
+}
+
 async function supabase(method, path, payload, { token } = {}) {
   const settings = requireSupabase();
   const restPath = path.startsWith('/rest/v1/');
@@ -47,7 +62,18 @@ async function supabase(method, path, payload, { token } = {}) {
   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
   if (!response.ok) {
     const detail = typeof data === 'object' && data ? (data.message || data.error_description || data.error) : data;
-    throw new HttpError(response.status === 401 ? 401 : 502, detail || 'The database request failed.');
+    const code = typeof data?.code === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(data.code) ? data.code : 'unavailable';
+    console.error('Supabase HTTP error:', {
+      endpoint: path.split('?')[0],
+      status: response.status,
+      code,
+      message: sanitizeSupabaseMessage(detail),
+    });
+    if (data?.code === 'P0001' && String(detail).includes('Checkout idempotency key')) {
+      throw new HttpError(409, 'This checkout attempt was already used for different order details. Start checkout again.');
+    }
+    if (data?.code === 'P0001') throw new HttpError(400, 'The request could not be completed. Check the submitted details and try again.');
+    throw new HttpError(response.status === 401 ? 401 : 502, 'The request could not be completed. Please try again.');
   }
   return data;
 }
@@ -66,16 +92,30 @@ function validEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && value.length <= 254;
 }
 
+function rejectHoneypot(payload) {
+  if (String(payload.website || '').trim()) throw new HttpError(400, 'Request could not be processed.');
+}
+
 async function paystack(method, path, payload) {
   const secret = process.env.PAYSTACK_SECRET_KEY;
   if (!secret) throw new HttpError(503, 'Paystack payments are not configured.');
-  const response = await fetch(`https://api.paystack.co${path}`, {
-    method,
-    headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/json' },
-    ...(payload === undefined ? {} : { body: JSON.stringify(payload) }),
-  });
-  const result = await response.json();
-  if (!response.ok || !result.status) throw new HttpError(502, result.message || 'Paystack rejected the request.');
+  let response;
+  try {
+    response = await fetch(`https://api.paystack.co${path}`, {
+      method,
+      headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/json' },
+      ...(payload === undefined ? {} : { body: JSON.stringify(payload) }),
+      signal: AbortSignal.timeout(12_000),
+    });
+  } catch (error) {
+    if (error?.name === 'TimeoutError' || error?.name === 'AbortError') {
+      throw new HttpError(503, 'Paystack did not respond in time. Check payment status before trying again.');
+    }
+    throw new HttpError(503, 'Paystack could not be reached. Please try again later.');
+  }
+  let result;
+  try { result = await response.json(); } catch { throw new HttpError(502, 'Paystack returned an invalid response.'); }
+  if (!response.ok || !result.status) throw new HttpError(502, 'Paystack could not complete the request.');
   return result.data;
 }
 
@@ -96,15 +136,17 @@ async function sendOrderEmail(email, name, orderId, totalMinor, items) {
       method: 'POST',
       headers: { Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString('base64')}`, 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
+      signal: AbortSignal.timeout(12_000),
     });
     return response.ok;
-  } catch (error) {
-    console.error('Mailgun confirmation failed:', error.message);
+  } catch {
+    console.error('Mailgun confirmation failed or timed out.');
     return false;
   }
 }
 
 async function trainingEnrollment(payload) {
+  rejectHoneypot(payload);
   const name = String(payload.name || '').trim();
   const email = String(payload.email || '').trim().toLowerCase();
   const phone = String(payload.phone || '').trim();
@@ -133,6 +175,7 @@ async function trainingEnrollment(payload) {
 }
 
 async function booking(payload) {
+  rejectHoneypot(payload);
   const name = String(payload.name || '').trim();
   const email = String(payload.email || '').trim().toLowerCase();
   const phone = String(payload.phone || '').trim();
@@ -159,6 +202,7 @@ async function booking(payload) {
 }
 
 async function contact(payload) {
+  rejectHoneypot(payload);
   const name = String(payload.name || '').trim();
   const email = String(payload.email || '').trim().toLowerCase();
   const topic = String(payload.topic || 'General enquiry').trim().slice(0, 80);
@@ -169,9 +213,17 @@ async function contact(payload) {
   return { id: rows?.[0]?.id, message: 'Thanks for writing. Your message is with our team.' };
 }
 
+async function subscribeNewsletter(payload) {
+  rejectHoneypot(payload);
+  const email = String(payload.email || '').trim().toLowerCase();
+  if (!validEmail(email)) throw new HttpError(400, 'Enter a valid email address.');
+  await supabase('POST', '/rest/v1/rpc/subscribe_newsletter', { p_email: email });
+  return { message: 'Thanks for subscribing. Keep an eye on your inbox!' };
+}
+
 async function checkout(payload, request) {
-  const authorization = request.headers.authorization || '';
-  if (!authorization.startsWith('Bearer ')) throw new HttpError(401, 'Sign in with Google before checkout.');
+  const authorization = request.headers.get('authorization') || '';
+  if (!authorization.startsWith('Bearer ')) throw new HttpError(401, 'Sign in before checkout.');
   const accessToken = authorization.slice(7);
   const user = await supabase('GET', '/auth/v1/user', undefined, { token: accessToken });
   const email = String(user.email || '').trim().toLowerCase();
@@ -180,32 +232,62 @@ async function checkout(payload, request) {
   const metadata = user.user_metadata || {};
   const name = String(payload.name || metadata.full_name || metadata.name || email.split('@')[0]).trim();
   const address = String(payload.address || '').trim();
+  const checkoutKey = String(payload.idempotencyKey || '').trim();
   if (!name || name.length > 120) throw new HttpError(400, 'Enter your name.');
   if (!address || address.length > 500) throw new HttpError(400, 'Enter a delivery address.');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(checkoutKey)) {
+    throw new HttpError(400, 'A valid checkout retry key is required. Refresh the checkout and try again.');
+  }
   if (!Array.isArray(payload.items) || !payload.items.length || payload.items.length > 50) throw new HttpError(400, 'Your basket is empty.');
   const quantities = new Map();
   for (const item of payload.items) {
     const id = Number(item.id), qty = Number(item.qty);
-    if (!Number.isInteger(id) || !Number.isInteger(qty) || id <= 0 || qty <= 0 || qty > 100) throw new HttpError(400, 'Invalid cart item.');
-    quantities.set(id, (quantities.get(id) || 0) + qty);
+    if (!Number.isInteger(id) || !Number.isInteger(qty) || id <= 0 || qty <= 0) throw new HttpError(400, 'Invalid cart item.');
+    if (qty > 100) throw new HttpError(400, 'A product quantity cannot exceed 100.');
+    const totalQuantity = (quantities.get(id) || 0) + qty;
+    if (totalQuantity > 100) throw new HttpError(400, 'A product quantity cannot exceed 100.');
+    quantities.set(id, totalQuantity);
   }
-  const rpc = await supabase('POST', '/rest/v1/rpc/create_order', {
+  const itemsForOrder = [...quantities].map(([id, qty]) => ({ id, qty })).sort((a, b) => a.id - b.id);
+  const checkoutPayloadHash = createHash('sha256').update(JSON.stringify({
+    userId, name, email, address, items: itemsForOrder,
+  })).digest('hex');
+  const rpc = await supabase('POST', '/rest/v1/rpc/create_order_idempotent', {
     p_user_id: userId,
     p_name: name,
     p_email: email,
     p_address: address,
-    p_items: [...quantities].map(([id, qty]) => ({ id, qty })),
+    p_items: itemsForOrder,
+    p_checkout_key: checkoutKey,
+    p_checkout_payload_hash: checkoutPayloadHash,
   });
   const order = Array.isArray(rpc) ? rpc[0] : rpc;
   if (!order?.id) throw new HttpError(502, 'The order was not saved.');
-  const items = await supabase('GET', `/rest/v1/order_items?select=product_name,unit_price_minor,quantity&order_id=eq.${encodeURIComponent(order.id)}`);
-  const emailSent = await sendOrderEmail(email, name, order.id, Number(order.total_minor), items || []);
-  try {
-    await supabase('PATCH', `/rest/v1/orders?id=eq.${encodeURIComponent(order.id)}`, { confirmation_email_status: emailSent ? 'sent' : 'failed' });
-  } catch (error) {
-    console.error('Could not update email status:', error.message);
+  let emailStatus = 'pending';
+  if (order.created) {
+    let emailSent = false;
+    try {
+      const items = await supabase('GET', `/rest/v1/order_items?select=product_name,unit_price_minor,quantity&order_id=eq.${encodeURIComponent(order.id)}`);
+      emailSent = await sendOrderEmail(email, name, order.id, Number(order.total_minor), items || []);
+      emailStatus = emailSent ? 'sent' : 'failed';
+    } catch (error) {
+      emailStatus = 'failed';
+      console.error('Could not prepare order confirmation email:', error.message);
+    }
+    try {
+      await supabase('PATCH', `/rest/v1/orders?id=eq.${encodeURIComponent(order.id)}`, { confirmation_email_status: emailStatus });
+    } catch (error) {
+      console.error('Could not update email status:', error.message);
+    }
+  } else {
+    try {
+      const savedOrder = await supabase('GET', `/rest/v1/orders?select=confirmation_email_status&id=eq.${encodeURIComponent(order.id)}&user_id=eq.${encodeURIComponent(userId)}`);
+      emailStatus = savedOrder?.[0]?.confirmation_email_status || 'pending';
+    } catch (error) {
+      console.error('Could not read order email status:', error.message);
+    }
   }
-  return { orderId: order.id, total: Number(order.total_minor), emailSent, customerName: name, email };
+  return { orderId: order.id, total: Number(order.total_minor), emailSent: emailStatus === 'sent', emailStatus, customerName: name, email };
 }
 
 async function initPayment(payload, request) {
@@ -215,14 +297,21 @@ async function initPayment(payload, request) {
   if (!Number.isInteger(enrollmentId) || enrollmentId <= 0 || !token) throw new HttpError(400, 'The training payment details are incomplete.');
   if (![1, 2].includes(installment)) throw new HttpError(400, 'Choose a valid instalment.');
   const enrollments = await supabase('GET', `/rest/v1/training_enrollments?select=id,email,payment_token_hash&id=eq.${enrollmentId}`);
-  const payments = await supabase('GET', `/rest/v1/training_payments?select=id,amount_minor,status&enrollment_id=eq.${enrollmentId}&installment_number=eq.${installment}`);
+  const payments = await supabase('GET', `/rest/v1/training_payments?select=id,amount_minor,status,payment_reference&enrollment_id=eq.${enrollmentId}&installment_number=eq.${installment}`);
   if (!enrollments?.length || !payments?.length || !safeEqual(enrollments[0].payment_token_hash, hashToken(token))) throw new HttpError(401, 'That training payment link is invalid.');
   const payment = payments[0];
   if (payment.status === 'paid') throw new HttpError(400, 'This instalment has already been paid.');
+  if (installment === 2) {
+    const first = await supabase('GET', `/rest/v1/training_payments?select=status&enrollment_id=eq.${enrollmentId}&installment_number=eq.1`);
+    if (!first?.length || first[0].status !== 'paid') throw new HttpError(409, 'The first instalment must be verified before starting the second payment.');
+  }
+  if (payment.status !== 'due') throw new HttpError(409, 'A payment attempt is already in progress or needs verification. Check its status before trying again.');
   const reference = `zamac-${randomBytes(20).toString('base64url')}`;
-  const host = request.headers.host || 'localhost';
+  const claimed = await supabase('PATCH', `/rest/v1/training_payments?id=eq.${payment.id}&status=eq.due`, { status: 'initializing', payment_reference: reference });
+  if (!Array.isArray(claimed) || !claimed.length) throw new HttpError(409, 'A payment attempt is already in progress. Check its status before trying again.');
+  const host = request.headers.get('host') || 'localhost';
   const base = (process.env.PUBLIC_BASE_URL || `https://${host}`).replace(/\/$/, '');
-  const callbackUrl = process.env.PAYSTACK_CALLBACK_URL || `${base}/?training_payment=verify`;
+  const callbackUrl = process.env.PAYSTACK_CALLBACK_URL || `${base}/zamac-fuds/?training_payment=verify`;
   const transaction = await paystack('POST', '/transaction/initialize', {
     email: enrollments[0].email,
     amount: String(payment.amount_minor),
@@ -232,7 +321,7 @@ async function initPayment(payload, request) {
     metadata: { enrollment_id: enrollmentId, installment_number: installment },
   });
   if (!transaction.authorization_url || transaction.reference !== reference) throw new HttpError(502, 'The payment page could not be created.');
-  await supabase('PATCH', `/rest/v1/training_payments?id=eq.${payment.id}`, { status: 'pending', payment_reference: reference });
+  await supabase('PATCH', `/rest/v1/training_payments?id=eq.${payment.id}&payment_reference=eq.${encodeURIComponent(reference)}`, { status: 'pending' });
   return { authorizationUrl: transaction.authorization_url, reference };
 }
 
@@ -251,9 +340,14 @@ async function verifyPayment(payload) {
     if (verified.status !== 'success' || Number(verified.amount) !== Number(payment.amount_minor) || verified.currency !== 'NGN' || verified.reference !== reference) {
       return { paid: false, enrollmentId: payment.enrollment_id, installment: payment.installment_number, message: 'Payment has not been confirmed. You can try again.' };
     }
-    await supabase('PATCH', `/rest/v1/training_payments?id=eq.${payment.id}`, { status: 'paid', paid_at: new Date().toISOString() });
-    await supabase('PATCH', `/rest/v1/training_enrollments?id=eq.${payment.enrollment_id}`, { status: payment.installment_number === 2 ? 'paid' : 'part_paid' });
+    const saved = await supabase('PATCH', `/rest/v1/training_payments?id=eq.${payment.id}&status=neq.paid`, { status: 'paid', paid_at: new Date().toISOString() });
+    if (!Array.isArray(saved) || !saved.length) {
+      const current = await supabase('GET', `/rest/v1/training_payments?select=status&id=eq.${payment.id}`);
+      if (current?.[0]?.status !== 'paid') throw new HttpError(503, 'Payment was verified but its status could not be saved. Please contact support before retrying.');
+    }
   }
+  const enrollmentUpdate = await supabase('PATCH', `/rest/v1/training_enrollments?id=eq.${payment.enrollment_id}`, { status: payment.installment_number === 2 ? 'paid' : 'part_paid' });
+  if (!Array.isArray(enrollmentUpdate) || !enrollmentUpdate.length) throw new HttpError(503, 'Payment was verified but enrollment status could not be saved. Please contact support.');
   if (payment.installment_number === 1) {
     const next = await supabase('GET', `/rest/v1/training_payments?select=amount_minor,status&enrollment_id=eq.${payment.enrollment_id}&installment_number=eq.2`);
     if (next?.length && next[0].status !== 'paid') nextAmount = Number(next[0].amount_minor);
@@ -270,7 +364,9 @@ export async function handleApi(request, route) {
       }
       if (route === '/api/products') {
         const settings = config();
-        if (!settings.url || !settings.publicKey || !settings.secretKey) return Response.json([]);
+        if (!settings.url || !settings.publicKey || !settings.secretKey) {
+          return Response.json({ error: 'The live menu is not configured.' }, { status: 503 });
+        }
         const products = await supabase('GET', '/rest/v1/products?select=id,name,category,description,size,badge,image_url,price_minor&active=eq.true&order=id.asc');
         return Response.json(products || []);
       }
@@ -285,6 +381,7 @@ export async function handleApi(request, route) {
     if (route === '/api/training-enrollments') result = await trainingEnrollment(payload);
     else if (route === '/api/bookings') result = await booking(payload);
     else if (route === '/api/contact') result = await contact(payload);
+    else if (route === '/api/newsletter') result = await subscribeNewsletter(payload);
     else if (route === '/api/checkout') result = await checkout(payload, request);
     else if (route === '/api/training-payments/initialize') result = await initPayment(payload, request);
     else if (route === '/api/training-payments/verify') result = await verifyPayment(payload);

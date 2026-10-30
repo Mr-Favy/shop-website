@@ -1,13 +1,12 @@
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { handleApi } from './api-lib.js';
+import { resolveStaticFile } from './static-files.js';
 
-const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 8000);
 const apiRoutes = new Set([
-  '/api/config', '/api/products', '/api/checkout', '/api/bookings', '/api/contact',
+  '/api/config', '/api/products', '/api/checkout', '/api/bookings', '/api/contact', '/api/newsletter',
   '/api/training-enrollments', '/api/training-payments/initialize', '/api/training-payments/verify',
 ]);
 const contentTypes = {
@@ -21,6 +20,10 @@ const contentTypes = {
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
   '.ico': 'image/x-icon',
+  '.avif': 'image/avif',
+  '.gif': 'image/gif',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
 };
 
 function sendJson(response, status, data) {
@@ -61,19 +64,13 @@ async function apiRequest(request, response, route) {
 }
 
 function staticFile(request, response) {
-  let pathname;
-  try {
-    pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-  } catch {
-    response.writeHead(400).end('Bad request');
+  const pathname = new URL(request.url, 'http://localhost').pathname;
+  const resolved = resolveStaticFile(pathname);
+  if (resolved.status !== 200) {
+    response.writeHead(resolved.status, { 'Content-Type': 'text/plain; charset=utf-8' }).end(resolved.status === 403 ? 'Forbidden' : 'Not found');
     return;
   }
-  if (pathname === '/') pathname = '/index.html';
-  const file = path.resolve(root, `.${pathname}`);
-  if (!file.startsWith(`${root}${path.sep}`) || !existsSync(file) || !statSync(file).isFile()) {
-    response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not found');
-    return;
-  }
+  const file = resolved.file;
   response.writeHead(200, {
     'Content-Type': contentTypes[path.extname(file).toLowerCase()] || 'application/octet-stream',
     'Cache-Control': 'no-cache',

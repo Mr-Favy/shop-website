@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F5F0E5">
+  <meta name="description" content="Contact Zammath Consulting with a company enquiry.">
+  <title>Contact Us | Zammath Consulting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/company/site.css">
+  <script src="/assets/company/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <zammath-header active="contact-us"></zammath-header>
+  <main class="page-main" id="main">
+    <section class="page-heading"><div class="wrap"><span class="eyebrow">Contact Us</span><h1>Start a conversation.</h1><p>Use the form to send an enquiry to Zammath Consulting. Verified phone, email and office details will be added when supplied.</p></div></section>
+    <section class="section section-white"><div class="wrap contact-layout"><div class="content-stack"><h2>Company enquiries</h2><p class="placeholder"><strong>Contact information needed</strong>Provide the official company email, telephone number, office address and service area if these should be published.</p></div>
+      <form class="contact-form" data-company-contact>
+        <label class="form-trap" aria-hidden="true">Leave this field empty<input name="website" tabindex="-1" autocomplete="off"></label>
+        <label>Your name<input name="name" autocomplete="name" maxlength="120" required></label>
+        <label>Email address<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+        <label>Enquiry type<select name="topic"><option>General enquiry</option><option>Company services</option><option>Our businesses</option><option>Other</option></select></label>
+        <label>Your message<textarea name="message" maxlength="2000" required></textarea></label>
+        <button class="button button-green" type="submit">Send enquiry</button>
+        <p class="form-message" role="status" aria-live="polite"></p>
+      </form>
+    </div></section>
+  </main>
+  <zammath-footer></zammath-footer>
+</body>
+</html>
