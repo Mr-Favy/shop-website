@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/", "destination": "/pages/company-home.html" },
+    { "source": "/zammath-consulting", "destination": "/pages/company-home.html" },
+    { "source": "/zammath-consulting/", "destination": "/pages/company-home.html" },
+    { "source": "/about-us", "destination": "/pages/about-us.html" },
+    { "source": "/about-us/", "destination": "/pages/about-us.html" },
+    { "source": "/our-services", "destination": "/pages/our-services.html" },
+    { "source": "/our-services/", "destination": "/pages/our-services.html" },
+    { "source": "/our-businesses", "destination": "/pages/our-businesses.html" },
+    { "source": "/our-businesses/", "destination": "/pages/our-businesses.html" },
+    { "source": "/contact-us", "destination": "/pages/contact-us.html" },
+    { "source": "/contact-us/", "destination": "/pages/contact-us.html" }
+  ]
+}

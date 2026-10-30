@@ -12,7 +12,7 @@ test('static resolver serves only intended public page and assets', () => {
 });
 
 test('the exact company routes resolve to their intended page files', () => {
-  assert.match(resolveStaticFile('/').file, /index\.html$/);
+  assert.match(resolveStaticFile('/').file, /pages[\\/]company-home\.html$/);
   assert.match(resolveStaticFile('/about-us/').file, /pages[\\/]about-us\.html$/);
   assert.match(resolveStaticFile('/our-services/').file, /pages[\\/]our-services\.html$/);
   assert.match(resolveStaticFile('/our-businesses/').file, /pages[\\/]our-businesses\.html$/);

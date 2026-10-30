@@ -4,11 +4,16 @@ import { readFile } from 'node:fs/promises';
 import { resolveStaticFile } from '../static-files.js';
 
 const pages = [
-  ['/', '../index.html'],
+  ['/', '../pages/company-home.html'],
+  ['/zammath-consulting', '../pages/company-home.html'],
   ['/zammath-consulting/', '../pages/company-home.html'],
+  ['/about-us', '../pages/about-us.html'],
   ['/about-us/', '../pages/about-us.html'],
+  ['/our-services', '../pages/our-services.html'],
   ['/our-services/', '../pages/our-services.html'],
+  ['/our-businesses', '../pages/our-businesses.html'],
   ['/our-businesses/', '../pages/our-businesses.html'],
+  ['/contact-us', '../pages/contact-us.html'],
   ['/contact-us/', '../pages/contact-us.html'],
   ['/zamac-fuds/', '../zamac-fuds/index.html'],
 ];
@@ -20,6 +25,48 @@ test('every approved corporate and storefront route serves its intended HTML pag
     const expected = await readFile(new URL(relativeFile, import.meta.url), 'utf8');
     const actual = await readFile(served.file, 'utf8');
     assert.equal(actual, expected, `${route} resolves to the intended page`);
+  }
+});
+
+test('Vercel rewrites all corporate URL variants without catching APIs or assets', async () => {
+  const root = resolveStaticFile('/');
+  const storefront = resolveStaticFile('/zamac-fuds/');
+  const storefrontAlias = resolveStaticFile('/index.html');
+  assert.equal(root.status, 200);
+  assert.equal(storefront.status, 200);
+  assert.equal(storefrontAlias.status, 200);
+  assert.equal(root.file, resolveStaticFile('/zammath-consulting/').file);
+  assert.equal(
+    await readFile(storefront.file, 'utf8'),
+    await readFile(new URL('../zamac-fuds/index.html', import.meta.url), 'utf8'),
+  );
+  assert.equal(
+    await readFile(storefrontAlias.file, 'utf8'),
+    await readFile(new URL('../index.html', import.meta.url), 'utf8'),
+  );
+
+  const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
+  const expectedRewrites = [
+    ['/', '/pages/company-home.html'],
+    ['/zammath-consulting', '/pages/company-home.html'],
+    ['/zammath-consulting/', '/pages/company-home.html'],
+    ['/about-us', '/pages/about-us.html'],
+    ['/about-us/', '/pages/about-us.html'],
+    ['/our-services', '/pages/our-services.html'],
+    ['/our-services/', '/pages/our-services.html'],
+    ['/our-businesses', '/pages/our-businesses.html'],
+    ['/our-businesses/', '/pages/our-businesses.html'],
+    ['/contact-us', '/pages/contact-us.html'],
+    ['/contact-us/', '/pages/contact-us.html'],
+  ].map(([source, destination]) => ({ source, destination }));
+  assert.deepEqual(vercel.rewrites, expectedRewrites);
+  assert.equal(vercel.rewrites.some(({ source }) => source.startsWith('/api/')), false);
+  assert.equal(vercel.rewrites.some(({ source }) => source.startsWith('/assets/')), false);
+  for (const route of ['/api/config', '/api/checkout', '/api/contact', '/api/newsletter']) {
+    assert.ok(await readFile(new URL(`..${route}.js`, import.meta.url), 'utf8'), `${route} function remains present`);
+  }
+  for (const asset of ['/assets/catalog.js', '/assets/company/site.css', '/assets/company/site.js']) {
+    assert.equal(resolveStaticFile(asset).status, 200, `${asset} remains an allowed local asset`);
   }
 });
 

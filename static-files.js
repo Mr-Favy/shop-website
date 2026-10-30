@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const publicRoot = path.join(projectRoot, 'public');
 const pageRoutes = new Map([
-  ['/', path.join(projectRoot, 'index.html')],
+  ['/', path.join(projectRoot, 'pages', 'company-home.html')],
   ['/index.html', path.join(projectRoot, 'index.html')],
   ['/zammath-consulting/', path.join(projectRoot, 'pages', 'company-home.html')],
   ['/zammath-consulting', path.join(projectRoot, 'pages', 'company-home.html')],
